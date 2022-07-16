@@ -1,0 +1,151 @@
+//Run users.py
+//Comment db.create_all()
+//Save/Rerun
+
+>>> import requests
+
+>>> BASE = "http://127.0.0.1:5000/"
+
+>>> phone1 = 9276855467
+
+>>> response1 = requests.put(
+    BASE + "user/" + str(phone1),
+    {
+        "username": "ahs3301",
+        "admin_stat": 0,
+        "comp_num": 0,
+    },
+)
+
+>>> response1.json()
+
+>>> response2 = requests.get(BASE + "user/" + str(phone1))
+
+>>> response2.json()
+
+//For lodging a new complaint
+
+>>> import base64
+
+>>> import codecs
+
+>>> import datetime
+
+>>> import time
+
+>>> with open("image1.jpeg", "rb") as file:
+    binaryData = file.read()
+    data = base64.b64encode(binaryData)
+    str_data = codecs.decode(data, "UTF-8")
+
+>>> comp_num = requests.get(BASE + "user/" + str(phone1))
+
+>>> comp_json = comp_num.json()
+
+>>> new_num = comp_json["comp_num"] + 1
+
+>>> id = str(phone1) + str(new_num)
+
+//Incrementing number of complaints in user DB before lodging a new open
+
+>>> requests.patch(BASE + "user/" + str(phone1))
+
+//Stop users.py
+//Run complaints.py
+//Comment db.create_all()
+//Save/Rerun
+
+>>> response3 = requests.put(
+    BASE + "complaint/" + id,
+    {
+        "subject": "Bad Drainage System @Hyd",
+        "description": "Drains are overflowing on highways and there is a huge traffic jam",
+        "date": datetime.datetime.now(),
+        "category": "municipality",
+        "location": "024.3445N126.1123E",
+        "creator_phone": str(phone1),
+        "status": "open",
+        "img": str_data,
+    },
+)
+
+>>> jsonresp3 = response3.json()
+
+>>> key = "id"
+
+>>> print(f"Complaint has been lodged! Please note the Complaint ID: {jsonresp3[key]}")
+
+//Lodging a second complaint 
+
+//Stop complaints.py
+//Run users.py
+
+>>> with open("image2.jpeg", "rb") as file:
+    binaryData = file.read()
+    data = base64.b64encode(binaryData)
+    str_data = codecs.decode(data, "UTF-8")
+
+>>> comp_num = requests.get(BASE + "user/" + str(phone1))
+
+>>> comp_json = comp_num.json()
+
+>>> new_num = comp_json["comp_num"] + 1
+
+>>> id = str(phone1) + str(new_num)
+
+//Incrementing number of complaints in user DB before lodging a new open
+
+>>> requests.patch(BASE + "user/" + str(phone1))
+
+//Stop users.py
+//Run complaints.py
+
+>>> response4 = requests.put(
+    BASE + "complaint/" + id,
+    {
+        "subject": "Extreme traffic jams",
+        "description": "Due to negligence of traffic police, there has been miles long traffic jam",
+        "date": datetime.datetime.now(),
+        "category": "traffic",
+        "location": "076.3456N119.1628E",
+        "creator_phone": str(phone1),
+        "status": "open",
+        "img": str_data,
+    },
+)
+
+>>> jsonresp4 = response4.json()
+
+>>> print(f"Complaint has been lodged! Please note the Complaint ID: {jsonresp4[key]}")
+
+
+//To fetch all complaints by a user, get number of complaints first
+
+//Stop complaints.py
+//Run users.py
+
+>>> response5 = requests.get(BASE + "user/" + str(phone1))
+
+>>> json_resp5 = response5.json()
+
+>>> num_comp = json_resp5["comp_num"]
+
+//Now use this to send requests in a loop for getting all the complaint objects
+
+//Stop users.py
+//Run complaints.py
+
+>>> comp_range = range(num_comp)
+
+>>> key2 = "subject"
+
+>>> for i in comp_range:
+    num = i + 1
+    comp_resp = requests.get(BASE + "getCompByNum/" + str(phone1) + "/" + str(num))
+    time.sleep(2)
+    json_comp = comp_resp.json()
+    print(f"Complaint ID: {json_comp[key]}, Subject: {json_comp[key2]}")
+
+
+
+
